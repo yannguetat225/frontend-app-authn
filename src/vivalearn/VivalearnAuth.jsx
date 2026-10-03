@@ -13,28 +13,49 @@ import { updatePathWithQueryParams } from '../data/utils';
 
 const SITE_URL = 'https://vivalearn.net/';
 
-export const AuthLayout = ({ children }) => (
-  <div className="vl-auth">
-    <header className="vl-auth-head">
-      <a className="vl-auth-brand" href={SITE_URL}>
-        <img src={getConfig().LOGO_URL} width="115" height="49" alt="VivaLearn" />
-        <span>Campus</span>
-      </a>
-      <a className="vl-auth-home" href={SITE_URL}>Retour au site <span aria-hidden="true">↗</span></a>
-    </header>
-    <main className="vl-auth-stage">
-      <div className="vl-auth-col">{children}</div>
-    </main>
-    <footer className="vl-auth-foot">
-      <span>Vivalearn · Création &amp; édition pédagogique</span>
-      <nav aria-label="Informations">
-        <a href={`${getConfig().LMS_BASE_URL}/help`}>Besoin d’aide</a>
-        <a href={`${SITE_URL}privacy.html`}>Confidentialité</a>
-        <a href={`${SITE_URL}tos.html`}>Conditions</a>
-      </nav>
-    </footer>
-  </div>
-);
+// Same rule as the other Campus applications (theme patch mfe-env-config-buildtime-definitions): dark when the
+// toggle is enabled and the learner chose it; the applications share this storage on apps-dev.
+const THEME_VARIANT_KEY = 'selected-paragon-theme-variant';
+
+const useCampusThemeVariant = () => {
+  useEffect(() => {
+    let variant = null;
+    try {
+      variant = window.localStorage.getItem(THEME_VARIANT_KEY);
+    } catch (e) {
+      variant = null;
+    }
+    if (getConfig().INDIGO_ENABLE_DARK_TOGGLE && variant === 'dark') {
+      document.documentElement.setAttribute('data-paragon-theme-variant', 'dark');
+    }
+  }, []);
+};
+
+export const AuthLayout = ({ children }) => {
+  useCampusThemeVariant();
+  return (
+    <div className="vl-auth">
+      <header className="vl-auth-head">
+        <a className="vl-auth-brand" href={SITE_URL}>
+          <img src={getConfig().LOGO_URL} width="115" height="49" alt="VivaLearn" />
+          <span>Campus</span>
+        </a>
+        <a className="vl-auth-home" href={SITE_URL}>Retour au site <span aria-hidden="true">↗</span></a>
+      </header>
+      <main className="vl-auth-stage">
+        <div className="vl-auth-col">{children}</div>
+      </main>
+      <footer className="vl-auth-foot">
+        <span>Vivalearn · Création &amp; édition pédagogique</span>
+        <nav aria-label="Informations">
+          <a href={`${getConfig().LMS_BASE_URL}/help`}>Besoin d’aide</a>
+          <a href={`${SITE_URL}privacy.html`}>Confidentialité</a>
+          <a href={`${SITE_URL}tos.html`}>Conditions</a>
+        </nav>
+      </footer>
+    </div>
+  );
+};
 
 AuthLayout.propTypes = {
   children: PropTypes.node.isRequired,

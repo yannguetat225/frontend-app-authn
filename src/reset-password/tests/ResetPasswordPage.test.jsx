@@ -100,7 +100,7 @@ describe('ResetPasswordPage', () => {
     fireEvent.change(newPasswordInput, { target: { value: password } });
     fireEvent.change(confirmPasswordInput, { target: { value: password } });
 
-    const resetPasswordButton = screen.getByRole('button', { name: /Reset password/i, id: 'submit-new-password' });
+    const resetPasswordButton = screen.getByRole('button', { name: /Enregistrer/i, id: 'submit-new-password' });
     await act(async () => {
       fireEvent.click(resetPasswordButton);
     });
@@ -119,7 +119,7 @@ describe('ResetPasswordPage', () => {
       },
     });
     render(reduxWrapper(<ResetPasswordPage {...props} />));
-    const resetPasswordButton = screen.getByRole('button', { name: /Reset password/i, id: 'submit-new-password' });
+    const resetPasswordButton = screen.getByRole('button', { name: /Enregistrer/i, id: 'submit-new-password' });
     fireEvent.click(resetPasswordButton);
 
     expect(screen.queryByText(/We couldn't reset your password./i)).toBeTruthy();
@@ -234,12 +234,11 @@ describe('ResetPasswordPage', () => {
 
   // ******** redirection tests ********
 
-  it('by clicking on sign in tab should redirect onto login page', async () => {
+  // VivaLearn: the « Retour » button replaces the sign-in tab
+  it('by clicking on the back button should redirect onto login page', async () => {
     const { getByText } = render(reduxWrapper(<ResetPasswordPage {...props} />));
 
-    const signInTab = getByText('Sign in');
-
-    fireEvent.click(signInTab);
+    fireEvent.click(getByText('Retour'));
 
     expect(mockedNavigator).toHaveBeenCalledWith(LOGIN_PAGE);
   });

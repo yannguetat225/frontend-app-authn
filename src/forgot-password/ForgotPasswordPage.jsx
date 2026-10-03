@@ -7,12 +7,8 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 import {
   Form,
   Hyperlink,
-  Icon,
   StatefulButton,
-  Tab,
-  Tabs,
 } from '@openedx/paragon';
-import { ChevronLeft } from '@openedx/paragon/icons';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +21,7 @@ import BaseContainer from '../base-container';
 import { FormGroup } from '../common-components';
 import { DEFAULT_STATE, LOGIN_PAGE, VALID_EMAIL_REGEX } from '../data/constants';
 import { updatePathWithQueryParams, windowScrollTo } from '../data/utils';
+import { BackButton, Heading, StepTop } from '../vivalearn/VivalearnAuth';
 
 const ForgotPasswordPage = (props) => {
   const platformName = getConfig().SITE_NAME;
@@ -87,13 +84,6 @@ const ForgotPasswordPage = (props) => {
     }
   };
 
-  const tabTitle = (
-    <div className="d-inline-flex flex-wrap align-items-center">
-      <Icon src={ChevronLeft} />
-      <span className="ml-2">{formatMessage(messages['sign.in.text'])}</span>
-    </div>
-  );
-
   return (
     <BaseContainer>
       <Helmet>
@@ -102,18 +92,13 @@ const ForgotPasswordPage = (props) => {
         </title>
       </Helmet>
       <div>
-        <Tabs activeKey="" id="controlled-tab" onSelect={(key) => navigate(updatePathWithQueryParams(key))}>
-          <Tab title={tabTitle} eventKey={LOGIN_PAGE} />
-        </Tabs>
+        {/* VivaLearn: « Pas à pas » heading and a back button instead of the sign-in tab */}
+        <StepTop />
+        <BackButton onClick={() => navigate(updatePathWithQueryParams(LOGIN_PAGE))} />
+        <Heading title="Mot de passe oublié ?" intro="Indiquez l’e-mail associé à votre compte" />
         <div id="main-content" className="main-content">
           <Form id="forget-password-form" name="forget-password-form" className="mw-xs">
             <ForgotPasswordAlert email={bannerEmail} emailError={formErrors} status={status} />
-            <h2 className="h4">
-              {formatMessage(messages['forgot.password.page.heading'])}
-            </h2>
-            <p className="mb-4">
-              {formatMessage(messages['forgot.password.page.instructions'])}
-            </p>
             <FormGroup
               floatingLabel={formatMessage(messages['forgot.password.page.email.field.label'])}
               name="email"
@@ -133,7 +118,7 @@ const ForgotPasswordPage = (props) => {
               className="forgot-password--button"
               state={submitState}
               labels={{
-                default: formatMessage(messages['forgot.password.page.submit.button']),
+                default: 'Recevoir un lien',
                 pending: '',
               }}
               onClick={handleSubmit}

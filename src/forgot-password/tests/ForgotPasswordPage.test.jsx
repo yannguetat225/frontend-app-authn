@@ -98,7 +98,7 @@ describe('ForgotPasswordPage', () => {
 
     fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
 
-    const submitButton = screen.getByText('Submit');
+    const submitButton = screen.getByText('Recevoir un lien');
     fireEvent.click(submitButton);
 
     const alertElements = container.querySelectorAll('.alert-danger');
@@ -124,7 +124,7 @@ describe('ForgotPasswordPage', () => {
     const validationMessage = 'We were unable to contact you.Enter your email below.';
     const { container } = render(reduxWrapper(<ForgotPasswordPage {...props} />));
 
-    const submitButton = screen.getByText('Submit');
+    const submitButton = screen.getByText('Recevoir un lien');
     fireEvent.click(submitButton);
 
     const alertElements = container.querySelectorAll('.alert-danger');
@@ -262,9 +262,8 @@ describe('ForgotPasswordPage', () => {
   it('should redirect onto login page', async () => {
     const { container } = render(reduxWrapper(<ForgotPasswordPage {...props} />));
 
-    const navElement = container.querySelector('nav');
-    const anchorElement = navElement.querySelector('a');
-    fireEvent.click(anchorElement);
+    // VivaLearn: the « Retour » button replaces the sign-in tab
+    fireEvent.click(container.querySelector('.vl-auth-back'));
 
     expect(mockedNavigator).toHaveBeenCalledWith(LOGIN_PAGE);
   });

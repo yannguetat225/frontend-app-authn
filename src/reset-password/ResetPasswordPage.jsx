@@ -5,13 +5,9 @@ import { getConfig } from '@edx/frontend-platform';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
   Form,
-  Icon,
   Spinner,
   StatefulButton,
-  Tab,
-  Tabs,
 } from '@openedx/paragon';
-import { ChevronLeft } from '@openedx/paragon/icons';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -30,6 +26,7 @@ import {
   LETTER_REGEX, LOGIN_PAGE, NUMBER_REGEX, RESET_PAGE,
 } from '../data/constants';
 import { getAllPossibleQueryParams, updatePathWithQueryParams, windowScrollTo } from '../data/utils';
+import { BackButton, Heading, StepTop } from '../vivalearn/VivalearnAuth';
 
 const ResetPasswordPage = (props) => {
   const { formatMessage } = useIntl();
@@ -125,13 +122,6 @@ const ResetPasswordPage = (props) => {
     }
   };
 
-  const tabTitle = (
-    <div className="d-inline-flex flex-wrap align-items-center">
-      <Icon src={ChevronLeft} />
-      <span className="ml-2">{formatMessage(messages['sign.in'])}</span>
-    </div>
-  );
-
   if (props.status === TOKEN_STATE.PENDING) {
     if (token) {
       props.validateToken(token);
@@ -150,14 +140,13 @@ const ResetPasswordPage = (props) => {
               {formatMessage(messages['reset.password.page.title'], { siteName: getConfig().SITE_NAME })}
             </title>
           </Helmet>
-          <Tabs activeKey="" id="controlled-tab" onSelect={(key) => navigate(updatePathWithQueryParams(key))}>
-            <Tab title={tabTitle} eventKey={LOGIN_PAGE} />
-          </Tabs>
+          {/* VivaLearn: « Pas à pas » heading and a back button instead of the sign-in tab */}
+          <StepTop />
+          <BackButton onClick={() => navigate(updatePathWithQueryParams(LOGIN_PAGE))} />
+          <Heading title="Nouveau mot de passe" intro="Saisissez puis confirmez votre nouveau mot de passe" />
           <div id="main-content" className="main-content">
             <div className="mw-xs">
               <ResetPasswordFailure errorCode={errorCode} errorMsg={props.errorMsg} />
-              <h4>{formatMessage(messages['reset.password'])}</h4>
-              <p className="mb-4">{formatMessage(messages['reset.password.page.instructions'])}</p>
               <Form id="set-reset-password-form" name="set-reset-password-form">
                 <PasswordField
                   name="newPassword"
@@ -185,7 +174,7 @@ const ResetPasswordPage = (props) => {
                   className="reset-password--button"
                   state={props.status}
                   labels={{
-                    default: formatMessage(messages['reset.password']),
+                    default: 'Enregistrer',
                     pending: '',
                   }}
                   onClick={e => handleSubmit(e)}
