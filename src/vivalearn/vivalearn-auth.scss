@@ -185,7 +185,7 @@
 
 // The charte colours text links in blue: restate the olive inside these pages only (buttons keep their own colours)
 .vl-auth a:not(.btn):not(.btn-social) { color: var(--vla-olive) !important; }
-.vl-auth .vl-auth-foot a { color: var(--vla-muted) !important; }
+.vl-auth .vl-auth-foot a:not(.btn):not(.btn-social) { color: var(--vla-muted) !important; }
 
 // Fields: permanent labels above 52 px fields
 .vl-auth {
