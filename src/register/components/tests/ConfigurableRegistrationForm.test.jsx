@@ -4,7 +4,7 @@ import { mergeConfig } from '@edx/frontend-platform';
 import {
   getLocale, IntlProvider,
 } from '@edx/frontend-platform/i18n';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 
@@ -124,10 +124,20 @@ describe('ConfigurableRegistrationForm', () => {
     jest.clearAllMocks();
   });
 
+  // VivaLearn: the e-mail is asked first, « Continuer » shows the other fields
+  const goToDetailsStep = (email = 'john.doe@gmail.com') => {
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: email, name: 'email' } });
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
+  };
+
   const populateRequiredFields = (getByLabelText, payload, isThirdPartyAuth = false) => {
+    // VivaLearn: the e-mail first, then « Continuer » and the other fields
+    fireEvent.change(getByLabelText('Email'), { target: { value: payload.email, name: 'email' } });
+    if (screen.queryByText('Continuer', { selector: '.vl-auth-main' })) {
+      fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
+    }
     fireEvent.change(getByLabelText('Full name'), { target: { value: payload.name, name: 'name' } });
     fireEvent.change(getByLabelText('Public username'), { target: { value: payload.username, name: 'username' } });
-    fireEvent.change(getByLabelText('Email'), { target: { value: payload.email, name: 'email' } });
 
     fireEvent.change(getByLabelText('Country/Region'), { target: { value: payload.country, name: 'country' } });
     fireEvent.blur(getByLabelText('Country/Region'), { target: { value: payload.country, name: 'country' } });
@@ -213,6 +223,7 @@ describe('ConfigurableRegistrationForm', () => {
         },
       });
       render(routerWrapper(reduxWrapper(<RegistrationPage {...props} />)));
+      goToDetailsStep();
       expect(document.querySelector('#profession')).toBeTruthy();
       expect(document.querySelector('#tos')).toBeTruthy();
     });
@@ -282,6 +293,7 @@ describe('ConfigurableRegistrationForm', () => {
       });
 
       const { container } = render(routerWrapper(reduxWrapper(<RegistrationPage {...props} />)));
+      goToDetailsStep();
       const submitButton = container.querySelector('button.btn-brand');
 
       fireEvent.click(submitButton);
@@ -308,6 +320,7 @@ describe('ConfigurableRegistrationForm', () => {
         },
       });
       const { container } = render(routerWrapper(reduxWrapper(<RegistrationPage {...props} />)));
+      goToDetailsStep();
       const countryInput = container.querySelector('input[name="country"]');
       fireEvent.change(countryInput, { target: { value: 'Pak', name: 'country' } });
       fireEvent.blur(countryInput, { target: { value: 'Pak', name: 'country' } });
@@ -333,11 +346,10 @@ describe('ConfigurableRegistrationForm', () => {
         },
       });
       const { getByLabelText, container } = render(routerWrapper(reduxWrapper(<RegistrationPage {...props} />)));
+      // VivaLearn: the e-mail is typed at step 1, its confirmation is a field of step 2
+      goToDetailsStep('test1@gmail.com');
 
-      const emailInput = getByLabelText('Email');
       const confirmEmailInput = getByLabelText('Confirm Email');
-
-      fireEvent.change(emailInput, { target: { value: 'test1@gmail.com', name: 'email' } });
       fireEvent.blur(confirmEmailInput, { target: { value: 'test2@gmail.com', name: 'confirm_email' } });
 
       const confirmEmailErrorElement = container.querySelector('div#confirm_email-error');
@@ -405,6 +417,7 @@ describe('ConfigurableRegistrationForm', () => {
       const { getByLabelText, container } = render(
         routerWrapper(reduxWrapper(<RegistrationPage {...props} />)),
       );
+      goToDetailsStep();
 
       const professionInput = getByLabelText('Profession');
       fireEvent.focus(professionInput);

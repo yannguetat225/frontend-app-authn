@@ -196,11 +196,10 @@ const LoginPage = ({
     } else if (value.length < 2) {
       message = formatMessage(messages['username.or.email.format.validation.less.chars.message']);
     }
-    if (message) {
-      setErrors(prevErrors => ({ ...prevErrors, emailOrUsername: message }));
-      return;
+    setErrors(prevErrors => ({ ...prevErrors, emailOrUsername: message }));
+    if (!message) {
+      setStep(2);
     }
-    setStep(2);
   };
 
   const handleOnChange = (event) => {
@@ -349,9 +348,12 @@ const LoginPage = ({
               thirdPartyAuthApiStatus={thirdPartyAuthApiStatus}
               isLoginPage
             />
-            <p className="vl-auth-switch">
-              Première visite ? <SwitchLink to={REGISTER_PAGE}>Demander un accès</SwitchLink>
-            </p>
+            {/* like the upstream tabs, no link to sign-up when it is closed or its links are hidden */}
+            {getConfig().ALLOW_PUBLIC_ACCOUNT_CREATION !== false && getConfig().SHOW_REGISTRATION_LINKS !== false && (
+              <p className="vl-auth-switch">
+                Première visite ? <SwitchLink to={REGISTER_PAGE}>Demander un accès</SwitchLink>
+              </p>
+            )}
           </>
         )}
       </div>

@@ -113,12 +113,13 @@ describe('Logistration', () => {
     });
   });
 
-  it('should do nothing when user clicks on the same tab (login/register) again', () => {
+  // VivaLearn: the links under each form replace the tabs and keep what a tab click did.
+  it('should send the toggle event of the other form when the link under the form is followed', () => {
     const { container } = render(reduxWrapper(<Logistration />));
-    // While staying on the registration form, clicking the register tab again
-    fireEvent.click(container.querySelector('a[data-rb-event-key="/register"]'));
+    fireEvent.click(container.querySelector('.vl-auth-switch a'));
 
     expect(sendTrackEvent).not.toHaveBeenCalledWith('edx.bi.register_form.toggled', { category: 'user-engagement' });
+    expect(sendTrackEvent).toHaveBeenCalledWith('edx.bi.login_form.toggled', { category: 'user-engagement' });
   });
 
   it('should render registration page', () => {
@@ -184,9 +185,8 @@ describe('Logistration', () => {
     // verifying sign in heading for institution login false
     expect(screen.getByRole('heading', { level: 3 }).textContent).toEqual('Sign in');
 
-    // verifying tabs heading for institution login true
-    fireEvent.click(screen.getByRole('link'));
-    expect(container.querySelector('#controlled-tab')).toBeDefined();
+    // VivaLearn: no link to the closed sign-up form
+    expect(container.querySelector('.vl-auth-switch')).toBeNull();
   });
 
   it('should display institution login option when secondary providers are present', () => {
@@ -284,7 +284,7 @@ describe('Logistration', () => {
   it('should fire action to backup registration form on tab click', () => {
     store.dispatch = jest.fn(store.dispatch);
     const { container } = render(reduxWrapper(<Logistration />));
-    fireEvent.click(container.querySelector('a[data-rb-event-key="/login"]'));
+    fireEvent.click(container.querySelector('.vl-auth-switch a'));
     expect(store.dispatch).toHaveBeenCalledWith(backupRegistrationForm());
   });
 
@@ -292,14 +292,14 @@ describe('Logistration', () => {
     store.dispatch = jest.fn(store.dispatch);
     const props = { selectedPage: LOGIN_PAGE };
     const { container } = render(reduxWrapper(<Logistration {...props} />));
-    fireEvent.click(container.querySelector('a[data-rb-event-key="/register"]'));
+    fireEvent.click(container.querySelector('.vl-auth-switch a'));
     expect(store.dispatch).toHaveBeenCalledWith(backupLoginForm());
   });
 
   it('should clear tpa context errorMessage tab click', () => {
     store.dispatch = jest.fn(store.dispatch);
     const { container } = render(reduxWrapper(<Logistration />));
-    fireEvent.click(container.querySelector('a[data-rb-event-key="/login"]'));
+    fireEvent.click(container.querySelector('.vl-auth-switch a'));
     expect(store.dispatch).toHaveBeenCalledWith(clearThirdPartyAuthContextErrorMessage());
   });
 });

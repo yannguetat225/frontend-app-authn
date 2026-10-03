@@ -442,9 +442,11 @@ const RegistrationPage = (props) => {
                   handleInstitutionLogin={handleInstitutionLogin}
                   thirdPartyAuthApiStatus={thirdPartyAuthApiStatus}
                 />
-                <p className="vl-auth-switch">
-                  Déjà un compte ? <SwitchLink to={LOGIN_PAGE}>Se connecter</SwitchLink>
-                </p>
+                {getConfig().SHOW_REGISTRATION_LINKS !== false && (
+                  <p className="vl-auth-switch">
+                    Déjà un compte ? <SwitchLink to={LOGIN_PAGE}>Se connecter</SwitchLink>
+                  </p>
+                )}
               </>
             )}
           </div>

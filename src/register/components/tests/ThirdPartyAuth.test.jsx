@@ -257,7 +257,7 @@ describe('ThirdPartyAuth', () => {
     });
 
     it('should render regular tpa button for invalid tpa_hint value', () => {
-      const expectedMessage = `${ssoProvider.name}`;
+      const expectedMessage = `Continuer avec ${ssoProvider.name}`;
       store = mockStore({
         ...initialState,
         commonComponents: {

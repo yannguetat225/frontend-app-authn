@@ -95,7 +95,7 @@ describe('LoginPage', () => {
       '',
       { selector: '#emailOrUsername' },
     ), { target: { value: identifier, name: 'emailOrUsername' } });
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
   };
 
   // ******** test login form submission ********
@@ -109,7 +109,7 @@ describe('LoginPage', () => {
       '',
       { selector: '#emailOrUsername' },
     ), { target: { value: 'test', name: 'emailOrUsername' } });
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
     fireEvent.change(screen.getByText(
       '',
       { selector: '#password' },
@@ -127,7 +127,7 @@ describe('LoginPage', () => {
     store.dispatch = jest.fn(store.dispatch);
     render(reduxWrapper(<LoginPage {...props} />));
 
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
     expect(store.dispatch).not.toHaveBeenCalledWith(loginRequest({}));
   });
 
@@ -162,14 +162,14 @@ describe('LoginPage', () => {
       '',
       { selector: '#emailOrUsername' },
     ), { target: { value: 't', name: 'emailOrUsername' } });
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
 
     expect(screen.getByText('Username or email must have at least 2 characters.')).toBeDefined();
   });
 
   it('should show error messages for required fields on empty form submission', () => {
     const { container } = render(reduxWrapper(<LoginPage {...props} />));
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
     expect(container.querySelector('div[feedback-for="emailOrUsername"]').textContent).toEqual(emptyFieldValidation.emailOrUsername);
 
     goToPasswordStep();
@@ -191,7 +191,7 @@ describe('LoginPage', () => {
       { selector: '#emailOrUsername' },
     ), { target: { value: 't', name: 'emailOrUsername' } });
 
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
 
     expect(container.querySelector('div[feedback-for="emailOrUsername"]').textContent).toEqual('Username or email must have at least 2 characters.');
   });
@@ -204,7 +204,7 @@ describe('LoginPage', () => {
 
     await act(async () => {
       // clicking « Continuer » with an empty field to make the error appear
-      fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+      fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
 
       // focusing the field to verify that the error is cleared
       fireEvent.focus(screen.getByText(
@@ -830,7 +830,7 @@ describe('LoginPage', () => {
 
     const { container } = render(reduxWrapper(<LoginPage {...props} />));
     expect(container.querySelector('input#emailOrUsername').value).toEqual('john_doe');
-    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    fireEvent.click(screen.getByText('Continuer', { selector: '.vl-auth-main' }));
     expect(container.querySelector('input#password').value).toEqual('test-password');
   });
 });
