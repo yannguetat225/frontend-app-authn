@@ -22,6 +22,8 @@ const FormGroup = (props) => {
 
   return (
     <Form.Group controlId={props.name} className={props.className} isInvalid={props.errorMessage !== ''}>
+      {/* VivaLearn: permanent label above the field instead of a floating one */}
+      <Form.Label className="vl-auth-label">{props.floatingLabel}</Form.Label>
       <Form.Control
         as={props.as}
         readOnly={props.readOnly}
@@ -38,7 +40,6 @@ const FormGroup = (props) => {
         onChange={props.handleChange}
         controlClassName={props.borderClass}
         trailingElement={props.trailingElement}
-        floatingLabel={props.floatingLabel}
       >
         {props.options ? props.options() : null}
       </Form.Control>

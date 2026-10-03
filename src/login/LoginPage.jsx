@@ -24,7 +24,7 @@ import { getThirdPartyAuthContext } from '../common-components/data/actions';
 import { thirdPartyAuthContextSelector } from '../common-components/data/selectors';
 import EnterpriseSSO from '../common-components/EnterpriseSSO';
 import ThirdPartyAuth from '../common-components/ThirdPartyAuth';
-import { PENDING_STATE, RESET_PAGE } from '../data/constants';
+import { PENDING_STATE, REGISTER_PAGE, RESET_PAGE } from '../data/constants';
 import {
   getActivationStatus,
   getAllPossibleQueryParams,
@@ -37,6 +37,9 @@ import { backupLoginFormBegin, dismissPasswordResetBanner, loginRequest } from '
 import { INVALID_FORM, TPA_AUTHENTICATION_FAILURE } from './data/constants';
 import LoginFailureMessage from './LoginFailure';
 import messages from './messages';
+import {
+  BackButton, Divider, Heading, Identity, StepTop, SwitchLink,
+} from '../vivalearn/VivalearnAuth';
 
 const LoginPage = ({
   institutionLogin,
@@ -85,6 +88,8 @@ const LoginPage = ({
     context: {},
   });
   const [errors, setErrors] = useState({ ...backedUpFormData.errors });
+  // VivaLearn: identifier first, then the password
+  const [step, setStep] = useState(1);
   const tpaHint = getTpaHint();
 
   useEffect(() => {
@@ -161,6 +166,9 @@ const LoginPage = ({
     const validationErrors = validateFormFields(formData);
     if (validationErrors.emailOrUsername || validationErrors.password) {
       setErrors({ ...validationErrors });
+      if (validationErrors.emailOrUsername) {
+        setStep(1);
+      }
       setErrorCode(prevState => ({
         type: INVALID_FORM,
         count: prevState.count + 1,
@@ -176,6 +184,23 @@ const LoginPage = ({
       ...queryParams,
     };
     dispatch(loginRequest(payload));
+  };
+
+  // Step 1 only checks the field locally: nothing tells whether an account exists before the password is sent.
+  const handleContinue = (event) => {
+    event.preventDefault();
+    const value = (formFields.emailOrUsername || '').trim();
+    let message = '';
+    if (value === '') {
+      message = formatMessage(messages['email.validation.message']);
+    } else if (value.length < 2) {
+      message = formatMessage(messages['username.or.email.format.validation.less.chars.message']);
+    }
+    if (message) {
+      setErrors(prevErrors => ({ ...prevErrors, emailOrUsername: message }));
+      return;
+    }
+    setStep(2);
   };
 
   const handleOnChange = (event) => {
@@ -239,6 +264,13 @@ const LoginPage = ({
         finishAuthUrl={finishAuthUrl}
       />
       <div className="mw-xs mt-3 mb-2">
+        <StepTop step={step} total={2} />
+        {step === 2 && <BackButton onClick={() => setStep(1)} />}
+        <Heading
+          focusKey={step}
+          title={step === 1 ? 'Heureux de vous revoir' : 'Votre mot de passe'}
+          intro={step === 1 ? 'Connectez-vous pour retrouver vos cours' : 'Utilisez le mot de passe de votre compte Vivalearn'}
+        />
         <LoginFailureMessage
           errorCode={errorCode.type}
           errorCount={errorCode.count}
@@ -253,58 +285,75 @@ const LoginPage = ({
         />
         {showResetPasswordSuccessBanner && <ResetPasswordSuccess />}
         <Form id="sign-in-form" name="sign-in-form">
-          <FormGroup
-            name="emailOrUsername"
-            value={formFields.emailOrUsername}
-            autoComplete="on"
-            handleChange={handleOnChange}
-            handleFocus={handleOnFocus}
-            errorMessage={errors.emailOrUsername}
-            floatingLabel={formatMessage(messages['login.user.identity.label'])}
-          />
-          <PasswordField
-            name="password"
-            value={formFields.password}
-            autoComplete="off"
-            showScreenReaderText={false}
-            showRequirements={false}
-            handleChange={handleOnChange}
-            handleFocus={handleOnFocus}
-            errorMessage={errors.password}
-            floatingLabel={formatMessage(messages['login.password.label'])}
-          />
-          <StatefulButton
-            name="sign-in"
-            id="sign-in"
-            type="submit"
-            variant="brand"
-            className="login-button-width"
-            state={submitState}
-            labels={{
-              default: formatMessage(messages['sign.in.button']),
-              pending: '',
-            }}
-            onClick={handleSubmit}
-            onMouseDown={(event) => event.preventDefault()}
-          />
-          <Link
-            id="forgot-password"
-            name="forgot-password"
-            className="btn btn-link font-weight-500 text-body"
-            to={updatePathWithQueryParams(RESET_PAGE)}
-            onClick={trackForgotPasswordLinkClick}
-          >
-            {formatMessage(messages['forgot.password'])}
-          </Link>
-          <ThirdPartyAuth
-            currentProvider={currentProvider}
-            providers={providers}
-            secondaryProviders={secondaryProviders}
-            handleInstitutionLogin={handleInstitutionLogin}
-            thirdPartyAuthApiStatus={thirdPartyAuthApiStatus}
-            isLoginPage
-          />
+          {step === 1 ? (
+            <>
+              <FormGroup
+                name="emailOrUsername"
+                value={formFields.emailOrUsername}
+                autoComplete="username"
+                handleChange={handleOnChange}
+                handleFocus={handleOnFocus}
+                errorMessage={errors.emailOrUsername}
+                floatingLabel={formatMessage(messages['login.user.identity.label'])}
+              />
+              <button type="submit" className="btn vl-auth-main" onClick={handleContinue}>Continuer</button>
+            </>
+          ) : (
+            <>
+              <Identity label="Connexion avec" value={formFields.emailOrUsername} onEdit={() => setStep(1)} />
+              <PasswordField
+                name="password"
+                value={formFields.password}
+                autoComplete="current-password"
+                showScreenReaderText={false}
+                showRequirements={false}
+                handleChange={handleOnChange}
+                handleFocus={handleOnFocus}
+                errorMessage={errors.password}
+                floatingLabel={formatMessage(messages['login.password.label'])}
+              />
+              <Link
+                id="forgot-password"
+                name="forgot-password"
+                className="btn btn-link font-weight-500 text-body"
+                to={updatePathWithQueryParams(RESET_PAGE)}
+                onClick={trackForgotPasswordLinkClick}
+              >
+                {formatMessage(messages['forgot.password'])}
+              </Link>
+              <StatefulButton
+                name="sign-in"
+                id="sign-in"
+                type="submit"
+                variant="brand"
+                className="login-button-width"
+                state={submitState}
+                labels={{
+                  default: formatMessage(messages['sign.in.button']),
+                  pending: '',
+                }}
+                onClick={handleSubmit}
+                onMouseDown={(event) => event.preventDefault()}
+              />
+            </>
+          )}
         </Form>
+        {step === 1 && (
+          <>
+            {!!providers.length && !currentProvider && <Divider />}
+            <ThirdPartyAuth
+              currentProvider={currentProvider}
+              providers={providers}
+              secondaryProviders={secondaryProviders}
+              handleInstitutionLogin={handleInstitutionLogin}
+              thirdPartyAuthApiStatus={thirdPartyAuthApiStatus}
+              isLoginPage
+            />
+            <p className="vl-auth-switch">
+              Première visite ? <SwitchLink to={REGISTER_PAGE}>Demander un accès</SwitchLink>
+            </p>
+          </>
+        )}
       </div>
     </>
   );

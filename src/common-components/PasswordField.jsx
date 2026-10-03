@@ -118,6 +118,8 @@ const PasswordField = (props) => {
 
   return (
     <Form.Group controlId={props.name} isInvalid={props.errorMessage !== ''}>
+      {/* VivaLearn: permanent label above the field instead of a floating one */}
+      <Form.Label className="vl-auth-label">{props.floatingLabel}</Form.Label>
       <OverlayTrigger key="tooltip" placement={placement} overlay={tooltip} show={showTooltip}>
         <Form.Control
           as="input"
@@ -132,7 +134,6 @@ const PasswordField = (props) => {
           onChange={props.handleChange}
           controlClassName={props.borderClass}
           trailingElement={isPasswordHidden ? ShowButton : HideButton}
-          floatingLabel={props.floatingLabel}
         />
       </OverlayTrigger>
       {props.errorMessage !== '' && (

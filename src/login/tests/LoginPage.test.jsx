@@ -89,6 +89,15 @@ describe('LoginPage', () => {
     };
   });
 
+  // VivaLearn: the identifier is asked first (« Continuer »), then the password.
+  const goToPasswordStep = (identifier = 'test') => {
+    fireEvent.change(screen.getByText(
+      '',
+      { selector: '#emailOrUsername' },
+    ), { target: { value: identifier, name: 'emailOrUsername' } });
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+  };
+
   // ******** test login form submission ********
 
   it('should submit form for valid input', () => {
@@ -100,6 +109,7 @@ describe('LoginPage', () => {
       '',
       { selector: '#emailOrUsername' },
     ), { target: { value: 'test', name: 'emailOrUsername' } });
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
     fireEvent.change(screen.getByText(
       '',
       { selector: '#password' },
@@ -117,10 +127,7 @@ describe('LoginPage', () => {
     store.dispatch = jest.fn(store.dispatch);
     render(reduxWrapper(<LoginPage {...props} />));
 
-    fireEvent.click(screen.getByText(
-      '',
-      { selector: '.btn-brand' },
-    ));
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
     expect(store.dispatch).not.toHaveBeenCalledWith(loginRequest({}));
   });
 
@@ -135,6 +142,7 @@ describe('LoginPage', () => {
 
     store.dispatch = jest.fn(store.dispatch);
     render(reduxWrapper(<LoginPage {...props} />));
+    goToPasswordStep();
     fireEvent.click(screen.getByText(
       '',
       { selector: '.btn-brand' },
@@ -152,29 +160,23 @@ describe('LoginPage', () => {
 
     fireEvent.change(screen.getByText(
       '',
-      { selector: '#password' },
-    ), { target: { value: 'test' } });
-    fireEvent.change(screen.getByText(
-      '',
       { selector: '#emailOrUsername' },
-    ), { target: { value: 't' } });
-
-    fireEvent.click(screen.getByText(
-      '',
-      { selector: '.btn-brand' },
-    ));
+    ), { target: { value: 't', name: 'emailOrUsername' } });
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
 
     expect(screen.getByText('Username or email must have at least 2 characters.')).toBeDefined();
   });
 
   it('should show error messages for required fields on empty form submission', () => {
     const { container } = render(reduxWrapper(<LoginPage {...props} />));
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
+    expect(container.querySelector('div[feedback-for="emailOrUsername"]').textContent).toEqual(emptyFieldValidation.emailOrUsername);
+
+    goToPasswordStep();
     fireEvent.click(screen.getByText(
       '',
       { selector: '.btn-brand' },
     ));
-
-    expect(container.querySelector('div[feedback-for="emailOrUsername"]').textContent).toEqual(emptyFieldValidation.emailOrUsername);
     expect(container.querySelector('div[feedback-for="password"]').textContent).toEqual(emptyFieldValidation.password);
 
     const alertBanner = 'We couldn\'t sign you in.Please fill in the fields below.';
@@ -189,10 +191,7 @@ describe('LoginPage', () => {
       { selector: '#emailOrUsername' },
     ), { target: { value: 't', name: 'emailOrUsername' } });
 
-    fireEvent.click(screen.getByText(
-      '',
-      { selector: '.btn-brand' },
-    ));
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
 
     expect(container.querySelector('div[feedback-for="emailOrUsername"]').textContent).toEqual('Username or email must have at least 2 characters.');
   });
@@ -204,17 +203,10 @@ describe('LoginPage', () => {
     render(reduxWrapper(<LoginPage {...props} />));
 
     await act(async () => {
-      // clicking submit button with empty fields to make the errors appear
-      fireEvent.click(screen.getByText(
-        '',
-        { selector: '.btn-brand' },
-      ));
+      // clicking « Continuer » with an empty field to make the error appear
+      fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
 
-      // focusing the fields to verify that the errors are cleared
-      fireEvent.focus(screen.getByText(
-        '',
-        { selector: '#password' },
-      ));
+      // focusing the field to verify that the error is cleared
       fireEvent.focus(screen.getByText(
         '',
         { selector: '#emailOrUsername' },
@@ -231,6 +223,7 @@ describe('LoginPage', () => {
 
   it('should match default button state', () => {
     render(reduxWrapper(<LoginPage {...props} />));
+    goToPasswordStep();
     expect(screen.getByText('Sign in')).toBeDefined();
   });
 
@@ -244,6 +237,7 @@ describe('LoginPage', () => {
     });
 
     render(reduxWrapper(<LoginPage {...props} />));
+    goToPasswordStep();
 
     expect(screen.getByText(
       'pending',
@@ -252,6 +246,7 @@ describe('LoginPage', () => {
 
   it('should show forgot password link', () => {
     render(reduxWrapper(<LoginPage {...props} />));
+    goToPasswordStep();
 
     expect(screen.getByText(
       'Forgot password',
@@ -698,7 +693,7 @@ describe('LoginPage', () => {
     window.location = { href: getConfig().BASE_URL.concat(LOGIN_PAGE), search: '?next=/dashboard&tpa_hint=invalid' };
 
     const { container } = render(reduxWrapper(<LoginPage {...props} />));
-    expect(container.querySelector(`#${ssoProvider.id}`).querySelector('#provider-name').textContent).toEqual(`${ssoProvider.name}`);
+    expect(container.querySelector(`#${ssoProvider.id}`).querySelector('#provider-name').textContent).toEqual(`Continuer avec ${ssoProvider.name}`);
 
     mergeConfig({
       DISABLE_ENTERPRISE_LOGIN: '',
@@ -785,6 +780,7 @@ describe('LoginPage', () => {
 
   it('should send track event when forgot password link is clicked', () => {
     render(reduxWrapper(<LoginPage {...props} />));
+    goToPasswordStep();
     fireEvent.click(screen.getByText(
       'Forgot password',
       { selector: '#forgot-password' },
@@ -834,6 +830,7 @@ describe('LoginPage', () => {
 
     const { container } = render(reduxWrapper(<LoginPage {...props} />));
     expect(container.querySelector('input#emailOrUsername').value).toEqual('john_doe');
+    fireEvent.click(screen.getByText('', { selector: '.vl-auth-main' }));
     expect(container.querySelector('input#password').value).toEqual('test-password');
   });
 });

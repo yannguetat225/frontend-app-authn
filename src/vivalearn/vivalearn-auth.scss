@@ -1,0 +1,379 @@
+// VivaLearn Campus — « Pas à pas » layout of the sign-in and sign-up pages (variant B, décision Yann 03/10/2026).
+// Scoped to .vl-auth: nothing here reaches the other applications. Colours from ~/vivalearn/DESIGN.md, headings in
+// the serif of the platform (décision Yann 03/10).
+.vl-auth {
+  --vla-canvas: #F5F0E8;
+  --vla-field: #FFFDF8;
+  --vla-ink: #292B26;
+  --vla-muted: #64665E;
+  --vla-olive: #354B1D;
+  --vla-on-olive: #FFFFFF;
+  --vla-line: #CCCDBF;
+  --vla-soft: #EDE8DD;
+  --vla-accent: #8B5520;
+  --vla-warn-bg: #F5DFC9;
+  --vla-warn-ink: #713B1C;
+  --vla-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --vla-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--vla-canvas);
+  color: var(--vla-ink);
+  font-family: var(--vla-sans);
+  font-size: 15px;
+  line-height: 1.5;
+
+  *, *::before, *::after { box-sizing: border-box; }
+  p { margin: 0; }
+  a { color: var(--vla-olive); text-underline-offset: 4px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--vla-accent);
+    outline-offset: 4px;
+    box-shadow: none;
+  }
+  .vl-auth-title:focus { outline: none; }
+}
+
+[data-paragon-theme-variant="dark"] .vl-auth {
+  --vla-canvas: #181B17;
+  --vla-field: #252923;
+  --vla-ink: #DEDDD4;
+  --vla-muted: #B0B2A8;
+  --vla-olive: #DCE5CC;
+  --vla-on-olive: #181B17;
+  --vla-line: #606655;
+  --vla-soft: #30362B;
+  --vla-accent: #E0A566;
+  --vla-warn-bg: #4A3520;
+  --vla-warn-ink: #F2DCC3;
+  color-scheme: dark;
+}
+
+.vl-auth-head, .vl-auth-stage, .vl-auth-foot {
+  width: min(1220px, calc(100% - 80px));
+  margin: 0 auto;
+}
+
+.vl-auth-head {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.vl-auth .vl-auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-decoration: none;
+  img { display: block; width: 115px; height: auto; }
+  span { font-size: 14px; padding-left: 20px; border-left: 1px solid var(--vla-line); color: var(--vla-muted); }
+}
+
+[data-paragon-theme-variant="dark"] .vl-auth .vl-auth-brand img {
+  background: #F5F0E8;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.vl-auth .vl-auth-home {
+  font-size: 14px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  span { font-size: 22px; }
+}
+
+.vl-auth-stage {
+  margin-top: 24px;
+  margin-bottom: 56px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 540px;
+}
+
+.vl-auth-col {
+  width: 410px;
+  max-width: 100%;
+  padding: 20px 0 28px;
+  // the containers of the upstream pages keep their own width otherwise
+  .mw-xs, #main-content, .main-content { max-width: none !important; min-width: 0 !important; width: 100%; margin: 0 !important; padding: 0 !important; }
+}
+
+.vl-auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.vl-auth-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--vla-accent);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.vl-auth-count { font-size: 12px; color: var(--vla-muted); }
+
+.vl-auth .vl-auth-title {
+  font-family: var(--vla-serif) !important;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--vla-ink);
+  margin: 0 0 12px;
+}
+
+.vl-auth .vl-auth-intro {
+  color: var(--vla-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 26px;
+}
+
+.vl-auth .vl-auth-back, .vl-auth .vl-auth-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--vla-olive);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.vl-auth .vl-auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: -10px 0 6px;
+}
+
+.vl-auth .vl-auth-link {
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.vl-auth .vl-auth-notice {
+  font-size: 13px;
+  background: var(--vla-soft);
+  padding: 12px 14px;
+  margin: 0 0 22px;
+  border-left: 2px solid var(--vla-accent);
+}
+
+.vl-auth-who {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -8px 0 14px;
+  p { font-size: 14px; color: var(--vla-muted); min-width: 0; overflow-wrap: anywhere; }
+  strong { color: var(--vla-ink); font-weight: 600; }
+}
+
+// The charte colours text links in blue: restate the olive inside these pages only (buttons keep their own colours)
+.vl-auth a:not(.btn):not(.btn-social) { color: var(--vla-olive) !important; }
+.vl-auth .vl-auth-foot a { color: var(--vla-muted) !important; }
+
+// Fields: permanent labels above 52 px fields
+.vl-auth {
+  .pgn__form-group, .form-group { margin-bottom: 18px; }
+  .vl-auth-label, .pgn__form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vla-ink);
+    margin: 0 0 7px;
+  }
+  .form-control, select.form-control, .pgn__form-control-decorator-group .form-control {
+    height: 52px;
+    border-radius: 9px !important;
+    border: 1px solid var(--vla-line) !important;
+    background: var(--vla-field) !important;
+    color: var(--vla-ink) !important;
+    font-size: 16px;
+    padding: 12px 14px;
+    box-shadow: none !important;
+  }
+  .form-control:focus { border-color: var(--vla-accent) !important; }
+  .pgn__form-group.pgn__form-control-invalid .form-control, .form-control[aria-invalid="true"] {
+    border: 2px solid var(--vla-warn-ink) !important;
+  }
+  // Paragon keeps a margin for decorators: the fields span the column like the buttons
+  .pgn__form-control-decorator-group { margin-inline-end: 0 !important; }
+  .pgn__form-control-decorator-trailing {
+    color: var(--vla-muted);
+    .btn-icon { color: var(--vla-muted); }
+  }
+  .pgn__form-control-description, .pgn__form-text, .form-text-size {
+    color: var(--vla-muted);
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  .pgn__form-control-invalid .pgn__form-text, .pgn__form-text-invalid, .invalid-feedback {
+    color: var(--vla-warn-ink) !important;
+  }
+}
+
+// Buttons: the main action spans the column, olive, rounded
+.vl-auth {
+  .vl-auth-main, .btn-brand, #sign-in, #register-user, .register-button, .login-button-width {
+    display: block;
+    width: 100% !important;
+    min-height: 52px;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: var(--vla-olive) !important;
+    color: var(--vla-on-olive) !important;
+    font-family: var(--vla-sans);
+    font-weight: 650 !important;
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    padding: 12px 16px !important;
+    box-shadow: none !important;
+  }
+  .vl-auth-main:hover, .btn-brand:hover { background: var(--vla-accent) !important; color: #FFFFFF !important; }
+  #forgot-password {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 !important;
+    margin: -6px 0 14px auto;
+    width: max-content;
+    color: var(--vla-olive) !important;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+[data-paragon-theme-variant="dark"] .vl-auth {
+  .vl-auth-main:hover, .btn-brand:hover { color: #181B17 !important; }
+}
+
+.vl-auth .vl-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--vla-muted);
+  font-size: 12px;
+  margin: 22px 0;
+  &::before, &::after { content: ""; height: 1px; background: var(--vla-line); flex: 1; }
+}
+
+// Google and WhatsApp: full-width buttons, Google keeps its white presentation and standard logo
+.vl-auth {
+  .row.m-0 { display: grid; gap: 10px; margin: 0 !important; }
+  .btn-social {
+    width: 100% !important;
+    min-height: 50px;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 16px !important;
+    border: 1px solid var(--vla-line) !important;
+    border-radius: 9px !important;
+    background: var(--vla-field) !important;
+    color: var(--vla-ink) !important;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: none !important;
+    #provider-name { margin: 0 !important; padding: 0 !important; color: inherit; font-weight: 600; }
+    .btn-tpa__image-icon, svg { width: 22px; height: 22px; }
+    &:hover { background: var(--vla-soft) !important; }
+  }
+  .btn-social.btn-oa2-google-oauth2 {
+    background: #FFFFFF !important;
+    color: #292B26 !important;
+    border-color: #BEC2B7 !important;
+    color-scheme: light;
+  }
+}
+
+.vl-auth .vl-auth-switch {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 22px;
+  color: var(--vla-muted);
+  a { font-weight: 650; }
+}
+
+.vl-auth .vl-auth-legal {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--vla-muted);
+  margin-top: 20px;
+  a { text-decoration: underline; text-underline-offset: 3px; }
+}
+
+// Messages of the upstream pages (wrong password, inactive account, provider not linked)
+.vl-auth {
+  .alert {
+    border-radius: 9px;
+    border: 0;
+    box-shadow: none;
+    background: var(--vla-warn-bg) !important;
+    color: var(--vla-warn-ink) !important;
+    padding: 14px;
+    font-size: 14px;
+    margin: 0 0 18px;
+    .alert-heading, a, p { color: var(--vla-warn-ink) !important; font-size: 14px; }
+    .alert-icon { display: none; }
+  }
+}
+
+.vl-auth-foot {
+  padding: 24px 0 26px;
+  border-top: 1px solid var(--vla-line);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--vla-muted);
+  font-size: 12px;
+  nav { display: flex; flex-wrap: wrap; gap: 20px; }
+}
+
+.vl-auth .vl-auth-foot a { color: var(--vla-muted); text-decoration: none; }
+
+@media (min-width: 1600px) {
+  .vl-auth-stage { margin-top: 40px; margin-bottom: 72px; }
+}
+
+@media (max-width: 1050px) {
+  .vl-auth-head, .vl-auth-stage, .vl-auth-foot { width: calc(100% - 48px); }
+}
+
+@media (max-width: 820px) {
+  .vl-auth-head { height: 88px; }
+  .vl-auth-stage { margin-top: 8px; min-height: 0; align-items: flex-start; }
+  .vl-auth-foot { flex-direction: column; gap: 8px; }
+}
+
+@media (max-width: 620px) {
+  .vl-auth-head, .vl-auth-stage, .vl-auth-foot { width: calc(100% - 28px); }
+  .vl-auth-head { height: 86px; gap: 8px; }
+  .vl-auth .vl-auth-brand { gap: 10px; img { width: 96px; } span { padding-left: 10px; font-size: 12px; } }
+  .vl-auth .vl-auth-home { font-size: 12px; gap: 6px; }
+  .vl-auth-stage { margin: 8px auto 34px; }
+  .vl-auth-col { padding: 18px 8px 8px; }
+  .vl-auth-eyebrow { font-size: 10px; }
+  .vl-auth .vl-auth-title { font-size: 30px; }
+  .vl-auth .vl-auth-intro { margin-bottom: 24px; }
+  .vl-auth-foot { padding: 18px 0; nav { gap: 14px; } }
+}

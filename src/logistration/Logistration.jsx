@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getConfig } from '@edx/frontend-platform';
@@ -28,6 +28,7 @@ import { backupLoginForm } from '../login/data/actions';
 import LoginComponentSlot from '../plugin-slots/LoginComponentSlot';
 import { RegistrationPage } from '../register';
 import { backupRegistrationForm } from '../register/data/actions';
+import { SwitchContext } from '../vivalearn/VivalearnAuth';
 
 const Logistration = ({
   selectedPage,
@@ -85,6 +86,9 @@ const Logistration = ({
     setKey(tabKey);
   };
 
+  // VivaLearn: the links under each form replace the tabs and keep what a tab click did
+  const switchTo = useCallback((tabKey) => handleOnSelect(tabKey, selectedPage), [selectedPage]); // eslint-disable-line react-hooks/exhaustive-deps, max-len
+
   const tabTitle = (
     <div className="d-flex">
       <Icon src={ChevronLeft} className="left-icon" />
@@ -103,7 +107,7 @@ const Logistration = ({
 
   return (
     <BaseContainer>
-      <div>
+      <SwitchContext.Provider value={switchTo}>
         {disablePublicAccountCreation
           ? (
             <>
@@ -131,16 +135,8 @@ const Logistration = ({
                     <Tab title={tabTitle} eventKey={selectedPage === LOGIN_PAGE ? LOGIN_PAGE : REGISTER_PAGE} />
                   </Tabs>
                 )
-                : (!isValidTpaHint() && !hideRegistrationLink && (
-                  <Tabs
-                    defaultActiveKey={selectedPage}
-                    id="controlled-tab"
-                    onSelect={(tabKey) => handleOnSelect(tabKey, selectedPage)}
-                  >
-                    <Tab title={formatMessage(messages['logistration.register'])} eventKey={REGISTER_PAGE} />
-                    <Tab title={formatMessage(messages['logistration.sign.in'])} eventKey={LOGIN_PAGE} />
-                  </Tabs>
-                ))}
+                // VivaLearn: no tabs, each page links to the other one under its form
+                : null}
               {key && (
                 <Navigate to={updatePathWithQueryParams(key)} replace />
               )}
@@ -166,7 +162,7 @@ const Logistration = ({
               </div>
             </div>
           )}
-      </div>
+      </SwitchContext.Provider>
     </BaseContainer>
   );
 };

@@ -41,13 +41,7 @@ const ThirdPartyAuth = (props) => {
 
   return (
     <>
-      {((isEnterpriseLoginDisabled && isInstitutionAuthActive) || isSocialAuthActive) && (
-        <div className="mt-4 mb-3 h4">
-          {isLoginPage
-            ? formatMessage(messages['login.other.options.heading'])
-            : formatMessage(messages['registration.other.options.heading'])}
-        </div>
-      )}
+      {/* VivaLearn: the pages show « ou continuer avec » above these buttons */}
       {(isLoginPage && !isEnterpriseLoginDisabled && isSocialAuthActive) && (
         <Hyperlink
           className={classNames(

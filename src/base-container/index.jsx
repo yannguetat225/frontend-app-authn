@@ -11,8 +11,13 @@ import {
   ImageExtraSmallLayout, ImageLargeLayout, ImageMediumLayout, ImageSmallLayout,
 } from './components/image-layout';
 import { AuthLargeLayout, AuthMediumLayout, AuthSmallLayout } from './components/welcome-page-layout';
+import { AuthLayout } from '../vivalearn/VivalearnAuth';
 
 const BaseContainer = ({ children, showWelcomeBanner, fullName }) => {
+  // VivaLearn: sign-in and sign-up in the « Pas à pas » layout; the welcome page keeps the upstream layouts.
+  if (!showWelcomeBanner) {
+    return <AuthLayout>{children}</AuthLayout>;
+  }
   const enableImageLayout = getConfig().ENABLE_IMAGE_LAYOUT;
 
   if (enableImageLayout) {

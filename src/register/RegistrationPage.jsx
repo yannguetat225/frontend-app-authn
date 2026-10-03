@@ -12,6 +12,12 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import Skeleton from 'react-loading-skeleton';
 
+import {
+  InstitutionLogistration,
+  PasswordField,
+  RedirectLogistration,
+  ThirdPartyAuthAlert,
+} from '../common-components';
 import ConfigurableRegistrationForm from './components/ConfigurableRegistrationForm';
 import RegistrationFailure from './components/RegistrationFailure';
 import {
@@ -31,21 +37,19 @@ import {
 } from './data/utils';
 import messages from './messages';
 import { EmailField, NameField, UsernameField } from './RegistrationFields';
-import {
-  InstitutionLogistration,
-  PasswordField,
-  RedirectLogistration,
-  ThirdPartyAuthAlert,
-} from '../common-components';
+import validateEmail from './RegistrationFields/EmailField/validator';
 import { getThirdPartyAuthContext as getRegistrationDataFromBackend } from '../common-components/data/actions';
 import EnterpriseSSO from '../common-components/EnterpriseSSO';
 import ThirdPartyAuth from '../common-components/ThirdPartyAuth';
 import {
-  COMPLETE_STATE, PENDING_STATE, REGISTER_PAGE,
+  COMPLETE_STATE, LOGIN_PAGE, PENDING_STATE, REGISTER_PAGE,
 } from '../data/constants';
 import {
   getAllPossibleQueryParams, getTpaHint, getTpaProvider, isHostAvailableInQueryParams, setCookie,
 } from '../data/utils';
+import {
+  BackButton, Divider, Heading, Identity, Legal, StepTop, SwitchLink,
+} from '../vivalearn/VivalearnAuth';
 
 /**
  * Main Registration Page component
@@ -97,6 +101,12 @@ const RegistrationPage = (props) => {
   const [formStartTime, setFormStartTime] = useState(null);
   // temporary error state for embedded experience because we don't want to show errors on blur
   const [temporaryErrors, setTemporaryErrors] = useState({ ...backedUpFormData.errors });
+  // VivaLearn: the e-mail first, then the name, the public username and the password. The completion after Google
+  // (currentProvider) and the embedded form keep a single step.
+  const twoSteps = !currentProvider && !registrationEmbedded;
+  const [step, setStep] = useState(1);
+  const showEmail = !twoSteps || step === 1;
+  const showDetails = !twoSteps || step === 2;
 
   const { cta, host } = queryParams;
   const buttonLabel = cta
@@ -254,6 +264,24 @@ const RegistrationPage = (props) => {
     registerUser();
   };
 
+  // Step 1 only checks the e-mail locally; an error found later on the e-mail (format, already used) brings it back.
+  const handleContinue = (e) => {
+    e.preventDefault();
+    const { fieldError } = validateEmail(formFields.email, null, formatMessage);
+    const message = fieldError || errors.email;
+    if (message) {
+      setErrors(prevErrors => ({ ...prevErrors, email: message }));
+      return;
+    }
+    setStep(2);
+  };
+
+  useEffect(() => {
+    if (twoSteps && errors.email) {
+      setStep(1);
+    }
+  }, [errors.email]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (autoSubmitRegForm && userPipelineDataLoaded) {
       registerUser();
@@ -297,6 +325,20 @@ const RegistrationPage = (props) => {
               { 'w-100 m-auto pt-4 main-content': registrationEmbedded },
             )}
           >
+            {twoSteps && <StepTop step={step} total={2} />}
+            {twoSteps && step === 2 && <BackButton onClick={() => setStep(1)} />}
+            {!registrationEmbedded && (
+              <Heading
+                focusKey={step}
+                title={showEmail && twoSteps ? 'Rejoignez le Campus' : 'Votre compte'}
+                intro={showEmail && twoSteps
+                  ? 'Créez votre compte pour demander l’accès à vos formations'
+                  : 'Quelques informations pour préparer votre accès'}
+              />
+            )}
+            {twoSteps && step === 1 && (
+              <p className="vl-auth-notice">Votre demande d’accès sera validée par l’équipe Vivalearn</p>
+            )}
             <ThirdPartyAuthAlert
               currentProvider={currentProvider}
               platformName={platformName}
@@ -308,27 +350,37 @@ const RegistrationPage = (props) => {
               context={{ provider: currentProvider, errorMessage: thirdPartyAuthErrorMessage }}
             />
             <Form id="registration-form" name="registration-form">
-              <NameField
-                name="name"
-                value={formFields.name}
-                shouldFetchUsernameSuggestions={!formFields.username.trim()}
-                handleChange={handleOnChange}
-                handleErrorChange={handleErrorChange}
-                errorMessage={errors.name}
-                helpText={[formatMessage(messages['help.text.name'])]}
-                floatingLabel={formatMessage(messages['registration.fullname.label'])}
-              />
-              <EmailField
-                name="email"
-                value={formFields.email}
-                confirmEmailValue={configurableFormFields?.confirm_email}
-                handleErrorChange={handleErrorChange}
-                handleChange={handleOnChange}
-                errorMessage={errors.email}
-                helpText={[formatMessage(messages['help.text.email'])]}
-                floatingLabel={formatMessage(messages['registration.email.label'])}
-              />
-              {!flags.autoGeneratedUsernameEnabled && (
+              {twoSteps && step === 2 && (
+                <Identity label="Demande pour" value={formFields.email} onEdit={() => setStep(1)} />
+              )}
+              {showDetails && (
+                <NameField
+                  name="name"
+                  value={formFields.name}
+                  shouldFetchUsernameSuggestions={!formFields.username.trim()}
+                  handleChange={handleOnChange}
+                  handleErrorChange={handleErrorChange}
+                  errorMessage={errors.name}
+                  helpText={[formatMessage(messages['help.text.name'])]}
+                  floatingLabel={formatMessage(messages['registration.fullname.label'])}
+                />
+              )}
+              {showEmail && (
+                <EmailField
+                  name="email"
+                  value={formFields.email}
+                  confirmEmailValue={configurableFormFields?.confirm_email}
+                  handleErrorChange={handleErrorChange}
+                  handleChange={handleOnChange}
+                  errorMessage={errors.email}
+                  helpText={[formatMessage(messages['help.text.email'])]}
+                  floatingLabel={formatMessage(messages['registration.email.label'])}
+                />
+              )}
+              {twoSteps && step === 1 && (
+                <button type="submit" className="btn vl-auth-main" onClick={handleContinue}>Continuer</button>
+              )}
+              {showDetails && !flags.autoGeneratedUsernameEnabled && (
                 <UsernameField
                   name="username"
                   spellCheck="false"
@@ -340,9 +392,10 @@ const RegistrationPage = (props) => {
                   floatingLabel={formatMessage(messages['registration.username.label'])}
                 />
               )}
-              {!currentProvider && (
+              {showDetails && !currentProvider && (
                 <PasswordField
                   name="password"
+                  autoComplete="new-password"
                   value={formFields.password}
                   handleChange={handleOnChange}
                   handleErrorChange={handleErrorChange}
@@ -350,30 +403,38 @@ const RegistrationPage = (props) => {
                   floatingLabel={formatMessage(messages['registration.password.label'])}
                 />
               )}
-              <ConfigurableRegistrationForm
-                email={formFields.email}
-                fieldErrors={errors}
-                formFields={configurableFormFields}
-                setFieldErrors={registrationEmbedded ? setTemporaryErrors : setErrors}
-                setFormFields={setConfigurableFormFields}
-                autoSubmitRegisterForm={autoSubmitRegForm}
-                fieldDescriptions={fieldDescriptions}
-              />
-              <StatefulButton
-                id="register-user"
-                name="register-user"
-                type="submit"
-                variant="brand"
-                className="register-button mt-4 mb-4"
-                state={submitState}
-                labels={{
-                  default: buttonLabel,
-                  pending: '',
-                }}
-                onClick={handleSubmit}
-                onMouseDown={(e) => e.preventDefault()}
-              />
-              {!registrationEmbedded && (
+              {showDetails && (
+                <ConfigurableRegistrationForm
+                  email={formFields.email}
+                  fieldErrors={errors}
+                  formFields={configurableFormFields}
+                  setFieldErrors={registrationEmbedded ? setTemporaryErrors : setErrors}
+                  setFormFields={setConfigurableFormFields}
+                  autoSubmitRegisterForm={autoSubmitRegForm}
+                  fieldDescriptions={fieldDescriptions}
+                />
+              )}
+              {showDetails && (
+                <StatefulButton
+                  id="register-user"
+                  name="register-user"
+                  type="submit"
+                  variant="brand"
+                  className="register-button mt-4 mb-4"
+                  state={submitState}
+                  labels={{
+                    default: buttonLabel,
+                    pending: '',
+                  }}
+                  onClick={handleSubmit}
+                  onMouseDown={(e) => e.preventDefault()}
+                />
+              )}
+              {showDetails && !registrationEmbedded && <Legal />}
+            </Form>
+            {twoSteps && step === 1 && (
+              <>
+                {!!providers.length && <Divider />}
                 <ThirdPartyAuth
                   currentProvider={currentProvider}
                   providers={providers}
@@ -381,8 +442,11 @@ const RegistrationPage = (props) => {
                   handleInstitutionLogin={handleInstitutionLogin}
                   thirdPartyAuthApiStatus={thirdPartyAuthApiStatus}
                 />
-              )}
-            </Form>
+                <p className="vl-auth-switch">
+                  Déjà un compte ? <SwitchLink to={LOGIN_PAGE}>Se connecter</SwitchLink>
+                </p>
+              </>
+            )}
           </div>
         )}
 
