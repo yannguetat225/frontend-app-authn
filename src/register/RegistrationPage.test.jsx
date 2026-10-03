@@ -363,6 +363,16 @@ describe('RegistrationPage', () => {
       expect(store.dispatch).not.toHaveBeenCalledWith(registerNewUser({}));
     });
 
+    it('shows username and password guidance before either field is focused', () => {
+      const { container } = render(routerWrapper(reduxWrapper(<RegistrationPage {...props} />)));
+      goToDetailsStep();
+      expect(screen.getByText('The name that will identify you in your courses.')).not.toBeNull();
+      expect(screen.getByText('This can not be changed later.')).not.toBeNull();
+      expect(screen.getByText('Password must contain at least 8 characters, at least one letter, and at least one number')).not.toBeNull();
+      expect(document.activeElement).not.toBe(container.querySelector('#username'));
+      expect(document.activeElement).not.toBe(container.querySelector('#password'));
+    });
+
     // ******** test registration form validations ********
 
     it('should show error messages for required fields on empty form submission', () => {

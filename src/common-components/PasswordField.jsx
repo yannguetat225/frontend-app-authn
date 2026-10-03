@@ -136,6 +136,11 @@ const PasswordField = (props) => {
           trailingElement={isPasswordHidden ? ShowButton : HideButton}
         />
       </OverlayTrigger>
+      {props.showRequirements && (
+        <Form.Control.Feedback type="default" className="d-block form-text-size">
+          {formatMessage(messages['password.sr.only.helping.text'])}
+        </Form.Control.Feedback>
+      )}
       {props.errorMessage !== '' && (
         <Form.Control.Feedback key="error" className="form-text-size" hasIcon={false} feedback-for={props.name} type="invalid">
           {props.errorMessage}

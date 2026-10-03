@@ -44,7 +44,7 @@ const FormGroup = (props) => {
         {props.options ? props.options() : null}
       </Form.Control>
       <TransitionReplace>
-        {hasFocus && props.helpText ? (
+        {(hasFocus || props.alwaysShowHelpText) && props.helpText ? (
           <Form.Control.Feedback type="default" key="help-text" className="d-block form-text-size">
             {props.helpText.map((message, index) => (
               <span key={`help-text-${index.toString()}`}>
@@ -64,6 +64,7 @@ const FormGroup = (props) => {
 };
 
 FormGroup.defaultProps = {
+  alwaysShowHelpText: false,
   as: 'input',
   autoComplete: null,
   borderClass: '',
@@ -83,6 +84,7 @@ FormGroup.defaultProps = {
 };
 
 FormGroup.propTypes = {
+  alwaysShowHelpText: PropTypes.bool,
   as: PropTypes.string,
   autoComplete: PropTypes.string,
   borderClass: PropTypes.string,
