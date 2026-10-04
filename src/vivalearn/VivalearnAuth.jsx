@@ -64,7 +64,8 @@ AuthLayout.propTypes = {
 export const StepTop = ({ step, total }) => (
   <div className="vl-auth-top">
     <span className="vl-auth-eyebrow">Votre espace apprenant</span>
-    {total ? <span className="vl-auth-count">{`0${step} / 0${total}`}</span> : null}
+    {/* « Étape N », as on the WhatsApp pages (no total there: an active account stops after the code) */}
+    {total ? <span className="vl-auth-count">{`Étape ${step}`}</span> : null}
   </div>
 );
 

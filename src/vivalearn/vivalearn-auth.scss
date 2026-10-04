@@ -227,6 +227,24 @@
   }
 }
 
+// Password requirements: always visible under the field, each one ticks as the learner types
+.vl-auth .vl-auth-rules {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: var(--vla-muted);
+}
+.vl-auth .vl-auth-rule {
+  display: inline-flex;
+  align-items: center;
+  .pgn__icon { width: 16px; height: 16px; color: currentColor !important; }
+  &.is-met { color: var(--vla-olive); font-weight: 600; }
+}
+
 // Buttons: the main action spans the column, olive, rounded
 .vl-auth {
   .vl-auth-main, .btn-brand, #sign-in, #register-user, .register-button, .login-button-width {

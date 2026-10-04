@@ -76,17 +76,14 @@ describe('PasswordField', () => {
     expect(passwordInput.type).toBe('password');
   });
 
-  it('should show password requirement tooltip on focus', async () => {
-    const { getByLabelText } = render(reduxWrapper(<PasswordField {...props} />));
-    const passwordInput = getByLabelText('Password');
-    jest.useFakeTimers();
-    await act(async () => {
-      fireEvent.focus(passwordInput);
-      jest.runAllTimers();
-    });
-    const passwordRequirementTooltip = document.querySelector('#password-requirement-left');
+  // VivaLearn: the requirements are a list under the field, visible without focus (no tooltip)
+  it('should show the password requirements without focus', () => {
+    render(reduxWrapper(<PasswordField {...props} />));
+    const requirements = document.querySelector('#password-requirements');
 
-    expect(passwordRequirementTooltip).toBeTruthy();
+    expect(requirements).toBeTruthy();
+    expect(requirements.querySelectorAll('li').length).toEqual(3);
+    expect(document.querySelector('[id^="password-requirement-"][role="tooltip"]')).toBeNull();
   });
 
   it('should show all password requirement checks as failed', async () => {

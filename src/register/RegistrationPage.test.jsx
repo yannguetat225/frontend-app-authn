@@ -368,7 +368,7 @@ describe('RegistrationPage', () => {
       goToDetailsStep();
       expect(screen.getByText('The name that will identify you in your courses.')).not.toBeNull();
       expect(screen.getByText('This can not be changed later.')).not.toBeNull();
-      expect(screen.getByText('Password must contain at least 8 characters, at least one letter, and at least one number')).not.toBeNull();
+      expect(screen.getByRole('list', { name: 'Password must contain at least 8 characters, at least one letter, and at least one number' })).not.toBeNull();
       expect(document.activeElement).not.toBe(container.querySelector('#username'));
       expect(document.activeElement).not.toBe(container.querySelector('#password'));
     });

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
-  Form, Icon, IconButton, OverlayTrigger, Tooltip, useToggle,
+  Form, Icon, IconButton, useToggle,
 } from '@openedx/paragon';
 import {
   Check, Remove, Visibility, VisibilityOff,
@@ -21,7 +21,6 @@ const PasswordField = (props) => {
 
   const validationApiRateLimited = useSelector(state => state.register.validationApiRateLimited);
   const [isPasswordHidden, setHiddenTrue, setHiddenFalse] = useToggle(true);
-  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
@@ -44,7 +43,6 @@ const PasswordField = (props) => {
       });
     }
 
-    setShowTooltip(props.showRequirements && false);
     if (props.handleErrorChange) { // If rendering from register page
       const fieldError = validatePasswordField(passwordValue, formatMessage);
       if (fieldError) {
@@ -67,7 +65,6 @@ const PasswordField = (props) => {
       props.handleErrorChange('password', '');
       dispatch(clearRegistrationBackendError('password'));
     }
-    setTimeout(() => setShowTooltip(props.showRequirements && true), 150);
   };
 
   const HideButton = (
@@ -98,47 +95,45 @@ const PasswordField = (props) => {
     />
   );
 
-  const placement = window.innerWidth < 768 ? 'top' : 'left';
-  const tooltip = (
-    <Tooltip id={`password-requirement-${placement}`}>
-      <span id="letter-check" className="d-flex align-items-center">
-        {LETTER_REGEX.test(props.value) ? <Icon className="text-success mr-1" src={Check} /> : <Icon className="mr-1 text-light-700" src={Remove} />}
-        {formatMessage(messages['one.letter'])}
-      </span>
-      <span id="number-check" className="d-flex align-items-center">
-        {NUMBER_REGEX.test(props.value) ? <Icon className="text-success mr-1" src={Check} /> : <Icon className="mr-1 text-light-700" src={Remove} />}
-        {formatMessage(messages['one.number'])}
-      </span>
-      <span id="characters-check" className="d-flex align-items-center">
-        {props.value.length >= 8 ? <Icon className="text-success mr-1" src={Check} /> : <Icon className="mr-1 text-light-700" src={Remove} />}
-        {formatMessage(messages['eight.characters'])}
-      </span>
-    </Tooltip>
+  // VivaLearn: the requirements stay visible under the field and tick as the learner types, instead of a tooltip
+  // that repeated them on focus and covered the field above on phones.
+  const requirement = (id, met, label) => (
+    <li id={id} className={met ? 'vl-auth-rule is-met' : 'vl-auth-rule'}>
+      {met ? <Icon className="text-success mr-1" src={Check} /> : <Icon className="mr-1 text-light-700" src={Remove} />}
+      {label}
+      {met && <span className="sr-only"> (respecté)</span>}
+    </li>
   );
 
   return (
     <Form.Group controlId={props.name} isInvalid={props.errorMessage !== ''}>
       {/* VivaLearn: permanent label above the field instead of a floating one */}
       <Form.Label className="vl-auth-label">{props.floatingLabel}</Form.Label>
-      <OverlayTrigger key="tooltip" placement={placement} overlay={tooltip} show={showTooltip}>
-        <Form.Control
-          as="input"
-          className="form-group__form-field"
-          type={isPasswordHidden ? 'password' : 'text'}
-          name={props.name}
-          value={props.value}
-          autoComplete={props.autoComplete}
-          aria-invalid={props.errorMessage !== ''}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onChange={props.handleChange}
-          controlClassName={props.borderClass}
-          trailingElement={isPasswordHidden ? ShowButton : HideButton}
-        />
-      </OverlayTrigger>
+      <Form.Control
+        as="input"
+        className="form-group__form-field"
+        type={isPasswordHidden ? 'password' : 'text'}
+        name={props.name}
+        value={props.value}
+        autoComplete={props.autoComplete}
+        aria-invalid={props.errorMessage !== ''}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onChange={props.handleChange}
+        controlClassName={props.borderClass}
+        trailingElement={isPasswordHidden ? ShowButton : HideButton}
+      />
       {props.showRequirements && (
         <Form.Control.Feedback type="default" className="d-block form-text-size">
-          {formatMessage(messages['password.sr.only.helping.text'])}
+          <ul
+            id={`${props.name}-requirements`}
+            className="vl-auth-rules"
+            aria-label={formatMessage(messages['password.sr.only.helping.text'])}
+          >
+            {requirement('letter-check', LETTER_REGEX.test(props.value), formatMessage(messages['one.letter']))}
+            {requirement('number-check', NUMBER_REGEX.test(props.value), formatMessage(messages['one.number']))}
+            {requirement('characters-check', props.value.length >= 8, formatMessage(messages['eight.characters']))}
+          </ul>
         </Form.Control.Feedback>
       )}
       {props.errorMessage !== '' && (
