@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 
 import { updatePathWithQueryParams } from '../data/utils';
 
-const SITE_URL = 'https://vivalearn.net/';
+const SITE_URL = 'https://vivalearn.org/';
 
 // Same rule as the other Campus applications (theme patch mfe-env-config-buildtime-definitions): dark when the
 // toggle is enabled and the learner chose it; the applications share this storage on apps-dev.
